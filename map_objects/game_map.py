@@ -75,6 +75,7 @@ class GameMap:
                 self.tiles[x][y].blocked = False
                 self.tiles[x][y].block_sight = False
                 self.tiles[x][y].room = True
+                self.tiles[x][y].corridor = False
 
     def create_h_tunnel(self, x1, x2, y):
         for x in range(min(x1, x2), max(x1, x2) + 1):           
