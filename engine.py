@@ -12,13 +12,14 @@ def main():
     map_width = 80
     map_height = 45
 
-    room_max_size = 10
-    room_min_size = 6
-    max_rooms = 30
+    room_max_size = 12
+    room_min_size = 8
+    max_rooms = 35
 
     colours = {
         'dark_wall': libtcod.Color(0, 0, 100),
-        'dark_ground': libtcod.Color(50, 50, 150)
+        'dark_ground': libtcod.Color(50, 50, 150),
+        'corridor': libtcod.Color(255, 0, 0)
         }
 
     player = Entity(int(screen_width / 2), int(screen_height / 2), '@', libtcod.white)

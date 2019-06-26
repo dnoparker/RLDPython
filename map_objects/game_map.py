@@ -1,10 +1,11 @@
-from random import randint
+from random import randint, seed
 
 from map_objects.tile import Tile
 from map_objects.rectangle import Rect
 
 
-class GameMap:
+class GameMap:   
+
     def __init__(self, width, height):
         self.width = width
         self.height = height
@@ -40,28 +41,28 @@ class GameMap:
                 self.create_room(new_room)
 
                 # center coordinates of new room, will be useful later
-                (new_x, new_y) = new_room.center()
+                (new_room_center_x, new_room_center_y) = new_room.center()
 
                 if num_rooms == 0:
                     # this is the first room, where the player starts at
-                    player.x = new_x
-                    player.y = new_y  
+                    player.x = new_room_center_x
+                    player.y = new_room_center_y  
                 else:
                     # all rooms after the first:
                     # connect it to the previous room with a tunnel
 
                     # center coordinates of previous room
-                    (prev_x, prev_y) = rooms[num_rooms - 1].center()
+                    (prev_room_center_x, prev_room_center_y) = rooms[num_rooms - 1].center()
 
                     # flip a coin (random number that is either 0 or 1)
                     if randint(0, 1) == 1:
                         # first move horizontally, then vertically
-                        self.create_h_tunnel(prev_x, new_x, prev_y)
-                        self.create_v_tunnel(prev_y, new_y, new_x)
+                        self.create_h_tunnel(prev_room_center_x, new_room_center_x, prev_room_center_y)
+                        self.create_v_tunnel(prev_room_center_y, new_room_center_y, new_room_center_x)
                     else:
                         # first move vertically, then horizontally
-                        self.create_v_tunnel(prev_y, new_y, prev_x)
-                        self.create_h_tunnel(prev_x, new_x, new_y)
+                        self.create_v_tunnel(prev_room_center_y, new_room_center_y, prev_room_center_x)
+                        self.create_h_tunnel(prev_room_center_x, new_room_center_x, new_room_center_y)
 
                 # finally, append the new room to the list
                 rooms.append(new_room)
@@ -73,17 +74,21 @@ class GameMap:
             for y in range(room.y1 + 1, room.y2):
                 self.tiles[x][y].blocked = False
                 self.tiles[x][y].block_sight = False
+                self.tiles[x][y].room = True
 
     def create_h_tunnel(self, x1, x2, y):
-        for x in range(min(x1, x2), max(x1, x2) + 1):
+        for x in range(min(x1, x2), max(x1, x2) + 1):           
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
+            if not self.tiles[x][y].room:
+                self.tiles[x][y].corridor = True           
 
     def create_v_tunnel(self, y1, y2, x):
-        for y in range(min(y1, y2), max(y1, y2) + 1):
+        for y in range(min(y1, y2), max(y1, y2) + 1):            
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
-
+            if not self.tiles[x][y].room:
+                self.tiles[x][y].corridor = True
 
     def is_blocked(self, x, y):
         if self.tiles[x][y].blocked:
