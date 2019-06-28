@@ -1,5 +1,6 @@
 import tcod as libtcod
 from entity import Entity, get_blocking_entities_at_location
+from player import Player
 from fov_functions import initialize_fov, recompute_fov
 from game_states import GameStates
 from input_handlers import handle_keys
@@ -31,8 +32,8 @@ def main():
         'corridor': libtcod.Color(255, 0, 0)
     }
 
-    player = Entity(0, 0, '@', libtcod.white, 'Player', blocks=True)
-    entities = [player]
+    playerEntity = Player(0, 0, '@', libtcod.white, 'Player', blocks=True)
+    entities = [playerEntity]
 
     libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
@@ -41,7 +42,7 @@ def main():
     con = libtcod.console_new(screen_width, screen_height)
 
     game_map = GameMap(map_width, map_height)
-    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, max_monsters_per_room)
+    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, playerEntity, entities, max_monsters_per_room)
 
     fov_recompute = True
     fov_map = initialize_fov(game_map)
@@ -55,7 +56,7 @@ def main():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
 
         if fov_recompute:
-            recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)       
+            recompute_fov(fov_map, playerEntity.x, playerEntity.y, fov_radius, fov_light_walls, fov_algorithm)       
 
         render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colours)
 
@@ -73,8 +74,8 @@ def main():
 
         if move and game_state == GameStates.PLAYERS_TURN:
             dx, dy = move
-            destination_x = player.x + dx
-            destination_y = player.y + dy
+            destination_x = playerEntity.x + dx
+            destination_y = playerEntity.y + dy
 
             if not game_map.is_blocked(destination_x, destination_y):
                 target = get_blocking_entities_at_location(entities, destination_x, destination_y)
@@ -82,7 +83,7 @@ def main():
                 if target:
                     print('You kick the ' + target.name + ' in the shins, much to its annoyance!')
                 else:
-                    player.move(dx, dy)
+                    playerEntity.move(dx, dy)
 
                     fov_recompute = True
 
@@ -97,9 +98,11 @@ def main():
             return True
 
         if game_state == GameStates.ENEMY_TURN:
-            for entity in entities:
-                if entity != player:
-                    print('The ' + entity.name + ' ponders the meaning of its existence.')
+            for x in entities:
+                if (not isinstance(x ,Player)):
+                    print('The ' + x.name + ' ponders the meaning of its existence.')
+                else:
+                    print (x.player_name)
 
             game_state = GameStates.PLAYERS_TURN
 
