@@ -100,10 +100,10 @@ def main():
             return True
 
         if game_state == GameStates.ENEMY_TURN:
-            for x in entities:
-                if not isinstance(x, Player):
-                    if x.ai:
-                        x.ai.take_turn(playerEntity, fov_map, game_map, entities)
+            for NPCs in entities:
+                if not isinstance(NPCs, Player):
+                    if NPCs.ai:
+                        NPCs.ai.take_turn(playerEntity, fov_map, game_map, entities)
 
             game_state = GameStates.PLAYERS_TURN
 
